@@ -5,8 +5,9 @@ import { Badge } from "@/components/ui/badge";
 
 export default function App() {
   const [quotes, setQuotes] = useState([]);
+  const [selectedTag, setSelectedTag] = useState(null);
   const [tags, setTags] = useState(["tag1", "tag2", "tag3", "tag4"]);
-  const[selectedTag,]
+  // const[selectedTag,]
 
   async function getQuotes() {
     const request = await fetch("/quotes.json");
@@ -15,8 +16,11 @@ export default function App() {
     setQuotes(podatki);
   }
 
-  function sestej(stevilo1, stevilo2) {
-    return stevilo1 + stevilo2;
+  function isQuoteSelected(quote) {
+    if (selectedTag === null) {
+      return true;
+    }
+    return quote.tags.includes(selectedTag);
   }
 
   useEffect(() => {
@@ -58,14 +62,40 @@ export default function App() {
 
   return (
     <>
-      {tags.map((tag) => (
-        <Badge variant="outline">{tag}</Badge>
-      ))}
+      <div className="p-4">
+        <div>
+          {tags.map((tag) => (
+            <Badge
+              className="cursor-pointer"
+              key={tag}
+              variant={selectedTag == tag ? "outline" : "default"}
+              // {
+              //   if (selectedTag == tag) {
+              //     return "outline"
+              //   } else {
+              //     return "default"
+              //   }
+              // }
+              onClick={() => {
+                if (tag === selectedTag) {
+                  setSelectedTag(null);
+                } else {
+                  setSelectedTag(tag);
+                }
+              }}
+            >
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      </div>
 
-      <div className="grid grid-cols-5 gap-4">
-        {quotes.map((quote) => (
-          <Quote quote={quote}></Quote>
-        ))}
+      <div className="grid grid-cols-3 gap-4">
+        {quotes
+          .filter((q) => isQuoteSelected(q))
+          .map((quote) => (
+            <Quote quote={quote}></Quote>
+          ))}
       </div>
     </>
   );
